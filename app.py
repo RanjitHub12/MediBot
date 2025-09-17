@@ -19,7 +19,6 @@ MODEL_NAME = "llama-3.1-8b-instant"
 
 # --- Caching the QA Chain ---
 # This is a key Streamlit concept. It ensures that we load the model and databasels
-ls
 # only once, making the app much faster on subsequent interactions.
 @st.cache_resource
 def load_qa_chain():
