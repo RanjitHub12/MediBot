@@ -2,22 +2,22 @@
 
 from dotenv import load_dotenv, find_dotenv
 
-# --- LangChain Imports ---
+# LangChain Imports 
 from langchain.chains import RetrievalQA
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
 
-# --- Load Environment Variables ---
+# Loading Environment Variables 
 load_dotenv(find_dotenv())
 
-# --- Configuration ---
+# Configuration 
 DB_FAISS_PATH = "vectorstore/db_faiss"
 MODEL_NAME = "llama-3.1-8b-instant"
 EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
-# --- The Central Function to Create the QA Chain ---
+# Central Function to Create the QA Chain 
 def create_qa_chain():
     """
     Creates and returns a RetrievalQA chain.
