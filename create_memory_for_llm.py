@@ -36,18 +36,18 @@ def create_vector_db():
     print(f"✅ Created {len(text_chunks)} text chunks.")
 
     # Step 3: Get the embedding model
-    # This model runs locally on your machine for free.
+    # This model runs locally on our machine for free.
     print("🔄 Initializing embedding model (sentence-transformers/all-MiniLM-L6-v2)...")
     embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     print("✅ Embedding model initialized.")
 
-    # Step 4: Create embeddings and store them in FAISS
+    # Step 4: Creating embeddings and storing them in FAISS
     print("🔄 Creating embeddings and building the FAISS vector store. This may take a moment...")
     db = FAISS.from_documents(text_chunks, embedding_model)
     db.save_local(DB_FAISS_PATH)
     print(f"🎉 Vector store successfully created and saved at '{DB_FAISS_PATH}'.")
 
 
-# This is the standard entry point for a Python script.
+# standard entry point for a Python script.
 if __name__ == "__main__":
     create_vector_db()
