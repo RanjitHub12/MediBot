@@ -2,41 +2,38 @@ import streamlit as st
 import os
 import time
 from dotenv import load_dotenv, find_dotenv
-
-# --- LangChain Imports ---
+# Importing langchain 
 from langchain.chains import RetrievalQA
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
 
-# --- Load Environment Variables ---
-# Make sure your .env file with GROQ_API_KEY is in the same directory
+# LoadingEnvironment Variables
 load_dotenv(find_dotenv())
 
-# --- Configuration ---
+# Configuration setting model name and database path
 DB_FAISS_PATH = "vectorstore/db_faiss"
 MODEL_NAME = "llama-3.1-8b-instant"
 
-# --- Caching the QA Chain ---
+# Caching the QA Chain 
 # This is a key Streamlit concept. It ensures that we load the model and database
 # only once, making the app much faster on subsequent interactions.
 @st.cache_resource
 def load_qa_chain():
     """
-    Loads the QA chain with the Groq LLM and the FAISS vector store.
-    The @_st.cache_resource decorator ensures this function only runs once.
+    Loading the QA chain with the Groq LLM and the FAISS vector store. The @_st.cache_resource decorator ensures this function only runs once.
     """
-    print("Loading QA chain... This will happen only once.")
+    print("Loading QA chain, happens only once.")
     
-    # Load the vector store
+    # Loading the vector store
     embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
     db = FAISS.load_local(DB_FAISS_PATH, embedding_model, allow_dangerous_deserialization=True)
     
-    # Initialize the Groq LLM
+    # Initializing the Groq LLM
     llm = ChatGroq(model=MODEL_NAME, temperature=0.5, max_tokens=512)
     
-    # Create a custom prompt
+    # Creating a custom prompt for dictating the way in which LLM should respond
     prompt_template = """
     Use the pieces of information provided in the context to answer the user's question.
     If you don't know the answer, just say that you don't know, don't try to make up an answer.
@@ -48,7 +45,7 @@ def load_qa_chain():
     """
     prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
     
-    # Create the RetrievalQA chain
+    # Create the RetrievalQA chain. LLM (language model) answers questions by retrieving relevant context from a knowledge base
     qa_chain = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
@@ -107,7 +104,7 @@ st.write("How can I assist you with your health today?")
 if "messages" not in st.session_state:
     st.session_state.messages = [{"role": "assistant", "content": "Hello! How can I help you with your health today?"}]
 
-# --- Clear Chat Button ---
+# Clear Chat Button
 if st.button("🗑️ Clear Chat"):
     st.session_state.messages = [
         {"role": "assistant", "content": "Hello! How can I help you with your health today?"}
@@ -133,14 +130,14 @@ if prompt := st.chat_input("Ask a question..."):
     with st.chat_message("assistant"):
         # Show a thinking spinner while processing the query
         with st.spinner("🤖 HealthMate is thinking..."):  
-            time.sleep(0.5)  # allow spinner to render
-            # Perform the actual query. THIS IS THE ONLY THING INSIDE THE SPINNER.
+            time.sleep(0.5)  # allowing spinner to render
+            # Perform the actual query. 
             response = qa_chain.invoke({'query': prompt})
         
         # Once the response is received, the spinner disappears, and we display the content.
         st.markdown(response["result"])
         
-        # Display the source documents in an expander
+        # Displaying the source documents in an expander
         with st.expander("View Sources"):
             st.write("The following sources were used to generate the answer:")
             for doc in response["source_documents"]:
@@ -148,7 +145,7 @@ if prompt := st.chat_input("Ask a question..."):
                 page_content = doc.page_content.replace('\n', ' ').strip()
                 st.info(f"**Page {doc.metadata.get('page', 'N/A')}:** \"{page_content[:250]}...\"")
 
-    # Add the assistant's full response to session state
+    # Adding the assistant's full response to session state
     assistant_response = {
         "role": "assistant",
         "content": response["result"] # We only store the main answer in history
